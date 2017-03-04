@@ -95,7 +95,7 @@ public class DBHelper {
             return size;
         }
 
-        public boolean insert(NoteVO note) {
+        public  boolean insert(NoteVO note) {
             ContentValues values = new ContentValues();
             values.put(DB_TABLE_COLUMN_TITLE, note.getTitle());
             values.put(DB_TABLE_COLUMN_CONTENT, note.getContent());

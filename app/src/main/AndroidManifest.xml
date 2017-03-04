@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.qingyu.qnote.AddNoteActivity"></activity>
+        <activity android:name="com.qingyu.qnote.NoteActivity"></activity>
     </application>
 
 </manifest>

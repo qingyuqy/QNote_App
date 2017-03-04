@@ -1,5 +1,6 @@
 package com.qingyu.qnote;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,37 +11,61 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
+import com.qingyu.qnote.Adapter.NoteAdapter;
+import com.qingyu.qnote.vo.NoteVO;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ListView note_ListView;
+    private FloatingActionButton fab;
+    private ArrayList<NoteVO> noteList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        noteList = new ArrayList<>();
+        NoteVO note = new NoteVO();
+        note.setTitle("意义");
+        note.setContent("意义在于人");
+        note.setDate(new Date().getTime());
+        noteList.add(note);
+        note_ListView=(ListView)findViewById(R.id.note_listview);
+        note_ListView.setAdapter(new NoteAdapter(this,noteList));
+        note_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                NoteVO note = noteList.get(position);
+                Intent intent = new Intent(MainActivity.this, NoteActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("Note",note);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        fab = (FloatingActionButton) findViewById(R.id.fab_add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
-               // draw("HelloWorld");
                 Intent intent = new Intent();
-                intent.setClass(MainActivity.this,AddNoteActivity.class);
+                intent.setClass(MainActivity.this,NoteActivity.class);
                 startActivity(intent);
             }
         });

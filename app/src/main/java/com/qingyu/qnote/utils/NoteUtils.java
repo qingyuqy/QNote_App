@@ -14,15 +14,17 @@ import java.util.List;
 public class NoteUtils {
     private DBHelper dbHelper;
     public boolean saveNote(NoteVO vo){
-        return false;
+        return dbHelper.insert(vo);
     }
     public boolean updateNote(NoteVO vo){
-        return false;
+        return dbHelper.insert(vo);
     }
     public List<NoteVO> retreiveNotes(){
-        return new ArrayList<NoteVO>() ;
+
+        return dbHelper.query() ;
     }
     public NoteVO getNote(long key){
+
         return new NoteVO();
     }
 }

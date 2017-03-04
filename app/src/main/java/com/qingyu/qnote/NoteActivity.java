@@ -1,31 +1,35 @@
 package com.qingyu.qnote;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.io.BufferedWriter;
+import com.qingyu.qnote.vo.NoteVO;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.Date;
 
-public class AddNoteActivity extends AppCompatActivity {
+public class NoteActivity extends Activity {
     private static final String DEFAULT_DIR = Environment.getExternalStorageDirectory() + File.separator + "QNote";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_note);
+        NoteVO note = (NoteVO) getIntent().getSerializableExtra("Note");
+        if(note==null){
+            Toast.makeText(this, "Null", Toast.LENGTH_LONG).show();
+        }
+        setContentView(R.layout.activity_note);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_save);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,10 +1,12 @@
 package com.qingyu.qnote.vo;
 
+import java.io.Serializable;
+
 /**
  * Created by QingYu on 2017/2/28 0028.
  */
 
-public class NoteVO {
+public class NoteVO implements Serializable {
 
     public long key;
     private String title;
