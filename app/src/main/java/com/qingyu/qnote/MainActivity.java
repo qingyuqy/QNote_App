@@ -31,6 +31,7 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.qingyu.qnote.Adapter.NoteAdapter;
+import com.qingyu.qnote.utils.NoteUtils;
 import com.qingyu.qnote.vo.NoteVO;
 
 import java.io.File;
@@ -45,27 +46,41 @@ public class MainActivity extends AppCompatActivity {
     private ListView note_ListView;
     private FloatingActionButton fab;
     private ArrayList<NoteVO> noteList;
+    private boolean firstStart;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        NoteUtils.getInstance().initDB(this);
         initView();
     }
-
     public void initView(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        noteList = new ArrayList<>();
-        NoteVO note = new NoteVO();
-        note.setTitle("意义");
-        note.setContent("意义在于人");
-        note.setDate(new Date().getTime());
-        NoteVO note1 = new NoteVO();
-        note1.setTitle("岁月");
-        note1.setContent("岁月不回头");
-        note1.setDate(new Date().getTime());
-        noteList.add(note);
-        noteList.add(note1);
+        fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this,NoteActivity.class);
+                startActivity(intent);
+            }
+        });
+        sp1 = getSharedPreferences("sign_note", MODE_PRIVATE);
+        if(sp1.getBoolean("isFirstStart",true)){
+            NoteVO note = new NoteVO();
+            note.setTitle("意义");
+            note.setContent("意义在于人");
+            note.setDate(new Date().getTime());
+            NoteUtils.getInstance().createNote(note);
+            SharedPreferences.Editor editor = sp1.edit();
+            editor.putBoolean("isFirstStart", false);
+            editor.commit();
+        }
+        noteList = (ArrayList<NoteVO>) NoteUtils.getInstance().retreiveNotes();
+        if(noteList.size()==0){
+            return;
+        }
         note_ListView=(ListView)findViewById(R.id.note_listview);
         note_ListView.setAdapter(new NoteAdapter(this,noteList));
         note_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -80,17 +95,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        fab = (FloatingActionButton) findViewById(R.id.fab_add);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this,NoteActivity.class);
-                startActivity(intent);
-            }
-        });
 
-         sp1 = getSharedPreferences("signature", MODE_PRIVATE);
+
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         lp.alpha = bgAlpha; // 0.0-1.0
         win.setAttributes(lp);
     }
+
 /*    public void draw(String text){
         Bitmap bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);

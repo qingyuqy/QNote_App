@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class NoteVO implements Serializable {
 
-    public long key;
+    public long key = -1;
     public String title;
     public String content;
     public long date;

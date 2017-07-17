@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
                 android:padding="3dp"
-                android:text="沒有请假"
+                android:text="内容"
                 android:textColor="#000000"
                 android:textSize="15sp" />
         </LinearLayout>

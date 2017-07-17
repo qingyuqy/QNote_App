@@ -22,6 +22,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.qingyu.qnote.utils.NoteUtils;
 import com.qingyu.qnote.vo.NoteVO;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public class NoteActivity extends AppCompatActivity {
     EditText etNote_title;
     EditText etNote_content;
     TextView tv_sign;
+    NoteVO note;
     private static SharedPreferences sp1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +45,13 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     public void initView(){
-        sp1 = getSharedPreferences("signature",MODE_PRIVATE);
-        NoteVO note = (NoteVO) getIntent().getSerializableExtra("Note");
+        sp1 = getSharedPreferences("sign_note",MODE_PRIVATE);
+        note = (NoteVO) getIntent().getSerializableExtra("Note");
         etNote_title = (EditText) findViewById(R.id.edText_title);
         etNote_content = (EditText) findViewById(R.id.edText_content);
         tv_sign = (TextView)findViewById(R.id.txView_sign);
         if(note==null){
-            Toast.makeText(this, "Null", Toast.LENGTH_LONG).show();
+            note = new NoteVO();
         }else{
             etNote_title.setText(note.getTitle());
             etNote_content.setText(note.getContent());
@@ -59,9 +61,33 @@ public class NoteActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveNoteasPic();
+
+                if(save()){
+                    Toast.makeText(NoteActivity.this, "保存并创建图片成功", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(NoteActivity.this, "保存失败", Toast.LENGTH_LONG).show();
+                };
             }
         });
+    }
+
+    public boolean save(){
+        boolean saved = false;
+        note.setTitle(etNote_title.getText().toString());
+        note.setContent(etNote_content.getText().toString());
+        note.setDate(new Date().getTime());
+        if(note.getKey()==-1){
+            saved = NoteUtils.getInstance().createNote(note);}
+        else{
+            saved = NoteUtils.getInstance().updateNote(note);
+        }
+        try{
+            saveNoteasPic();
+            saved = true;
+        }catch(Exception ex) {
+            saved = false;
+        }
+        return saved;
     }
     public void saveNoteasPic(){
         LinearLayout layout = (LinearLayout) findViewById(R.id.layout_note);
