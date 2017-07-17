@@ -9,10 +9,9 @@ import java.io.Serializable;
 public class NoteVO implements Serializable {
 
     public long key;
-    private String title;
-    private String content;
-    private String sign;
-    private long date;
+    public String title;
+    public String content;
+    public long date;
 
     public long getKey() {
         return key;
@@ -35,14 +34,6 @@ public class NoteVO implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getSign() {
-        return sign;
-    }
-
-    public void setSign(String sign) {
-        this.sign = sign;
     }
 
     public long getDate() {

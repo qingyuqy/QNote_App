@@ -1,10 +1,7 @@
 package com.qingyu.qnote.utils;
 
-import android.provider.ContactsContract;
-
 import com.qingyu.qnote.vo.NoteVO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,19 +9,17 @@ import java.util.List;
  */
 
 public class NoteUtils {
-    private DBHelper dbHelper;
+    private NoteDBHelper dbHelper;
     public boolean saveNote(NoteVO vo){
-        return dbHelper.insert(vo);
+        return false;
     }
     public boolean updateNote(NoteVO vo){
-        return dbHelper.insert(vo);
+        return false;
     }
     public List<NoteVO> retreiveNotes(){
-
-        return dbHelper.query() ;
+        return null;
     }
     public NoteVO getNote(long key){
-
-        return new NoteVO();
+        return null;
     }
 }

@@ -23,7 +23,8 @@
         <EditText
             android:id="@+id/edText_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            />
         <EditText
             android:id="@+id/edText_content"
             android:layout_width="match_parent"
@@ -35,6 +36,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:text="By QingYu"
-            android:paddingRight="10dp"/>
+            android:padding="10dp"/>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
