@@ -68,9 +68,17 @@ public class NoteAdapter extends BaseAdapter {
 		} else {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
-        viewHolder.tvNote_title.setText(note.getTitle());
+		String title = note.getTitle();
+		String desc = note.getContent();
+		if(title.length()>4){
+			title = title.substring(0,3);
+		}
+		if(desc.length()>10){
+			desc = desc.substring(0,9);
+		}
+        viewHolder.tvNote_title.setText(title);
         viewHolder.tvNote_date.setText(getDateStr(note.getDate()));
-        viewHolder.tvNote_desc.setText(note.getContent());
+        viewHolder.tvNote_desc.setText(desc);
 
 		return convertView;
 	}

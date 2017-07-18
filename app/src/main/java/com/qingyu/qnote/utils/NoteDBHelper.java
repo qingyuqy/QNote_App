@@ -119,6 +119,17 @@ public class NoteDBHelper {
         }
         return true;
     }
+    public boolean delete(NoteVO note) {
+        if (note.key == -1) {
+            return false;
+        }
+        String condition = DB_PRIMARY_KEY + "=" + "\'" + note.key + "\'";
+        int rows = mDB.delete(DB_TABLE_NAME, condition, null);
+        if(rows <= 0){
+            return false;
+        }
+        return true;
+    }
 
     protected boolean update(ContentValues values, String whereClause, String[] whereArgs) {
         int rows = mDB.update(DB_TABLE_NAME, values, whereClause, whereArgs);

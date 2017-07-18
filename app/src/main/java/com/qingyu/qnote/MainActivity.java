@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -46,26 +47,19 @@ public class MainActivity extends AppCompatActivity {
     private ListView note_ListView;
     private FloatingActionButton fab;
     private ArrayList<NoteVO> noteList;
+    NoteAdapter noteAdapter;
     private boolean firstStart;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        NoteUtils.getInstance().initDB(this);
+        initData();
         initView();
     }
-    public void initView(){
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        fab = (FloatingActionButton) findViewById(R.id.fab_add);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this,NoteActivity.class);
-                startActivity(intent);
-            }
-        });
+
+    public void initData(){
+        NoteUtils.getInstance().initDB(this);
         sp1 = getSharedPreferences("sign_note", MODE_PRIVATE);
         if(sp1.getBoolean("isFirstStart",true)){
             NoteVO note = new NoteVO();
@@ -78,11 +72,26 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
         }
         noteList = (ArrayList<NoteVO>) NoteUtils.getInstance().retreiveNotes();
+    }
+    public void initView(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        fab = (FloatingActionButton) findViewById(R.id.fab_add);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this,NoteActivity.class);
+                startActivityForResult(intent,0);
+            }
+        });
+
         if(noteList.size()==0){
             return;
         }
+        noteAdapter = new NoteAdapter(this,noteList);
         note_ListView=(ListView)findViewById(R.id.note_listview);
-        note_ListView.setAdapter(new NoteAdapter(this,noteList));
+        note_ListView.setAdapter(noteAdapter);
         note_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -91,13 +100,30 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Note",note);
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent,1);
             }
         });
 
+        note_ListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                NoteVO note = noteList.get(position);
+                if( NoteUtils.getInstance().deleteNote(note)){
+                    Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_LONG).show();
+                    refreshData();
+                    return true;
+                }
+                else
+                    return false;
+            }
+        });
 
+    }
 
-
+    public  void refreshData(){
+        noteList.clear();
+        noteList.addAll((ArrayList<NoteVO>) NoteUtils.getInstance().retreiveNotes());
+        noteAdapter.notifyDataSetChanged();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -105,52 +131,65 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 0:
+                refreshData();
+            case 1:
+                refreshData();
+            default:
+                refreshData();
+        }
+        }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            final Window win = getWindow();
-            LayoutInflater mInflater = LayoutInflater.from(this);
-            View popView = mInflater.inflate(R.layout.personalized, null);
-            final EditText et_sign = (EditText) popView.findViewById(R.id.et_sign);
-            Button bt_save = (Button) popView.findViewById(R.id.bt_save);
-            final PopupWindow popWindow = new PopupWindow(popView,
-                    ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
-            popWindow.setFocusable(true);
-            popWindow.setBackgroundDrawable(new BitmapDrawable());
-            popWindow.setOutsideTouchable(true);
-            popWindow.showAtLocation(this.getCurrentFocus(), Gravity.CENTER_VERTICAL
-                    | Gravity.CENTER_HORIZONTAL, 0, 0);
-            setbackgroundAlpha(0.7f, win);
-            popWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-
-                @Override
-                public void onDismiss() {
-                    setbackgroundAlpha(1f, win);
-                }
-            });
-            bt_save.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SharedPreferences.Editor editor = sp1.edit();
-                    editor.putString("signature",et_sign.getText().toString());
-                    editor.commit();
-                    Toast.makeText(MainActivity.this, "保存成功", Toast.LENGTH_LONG).show();
-                    popWindow.dismiss();
-                }
-            });
+            personalized();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void personalized(){
+        final Window win = getWindow();
+        LayoutInflater mInflater = LayoutInflater.from(this);
+        View popView = mInflater.inflate(R.layout.personalized, null);
+        final EditText et_sign = (EditText) popView.findViewById(R.id.et_sign);
+        Button bt_save = (Button) popView.findViewById(R.id.bt_save);
+        final PopupWindow popWindow = new PopupWindow(popView,
+                ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        popWindow.setFocusable(true);
+        popWindow.setBackgroundDrawable(new BitmapDrawable());
+        popWindow.setOutsideTouchable(true);
+        popWindow.showAtLocation(this.getCurrentFocus(), Gravity.CENTER_VERTICAL
+                | Gravity.CENTER_HORIZONTAL, 0, 0);
+        setbackgroundAlpha(0.7f, win);
+        popWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+
+            @Override
+            public void onDismiss() {
+                setbackgroundAlpha(1f, win);
+            }
+        });
+        et_sign.setText(sp1.getString("signature",""));
+        bt_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = sp1.edit();
+                editor.putString("signature",et_sign.getText().toString());
+                editor.commit();
+                Toast.makeText(MainActivity.this, "保存成功", Toast.LENGTH_LONG).show();
+                popWindow.dismiss();
+            }
+        });
+    }
     public static void setbackgroundAlpha(float bgAlpha, Window win) {
         WindowManager.LayoutParams lp = win.getAttributes();
         lp.alpha = bgAlpha; // 0.0-1.0

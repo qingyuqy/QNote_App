@@ -26,7 +26,7 @@ public class NoteUtils {
         return NoteDBHelper.getInstance().update(vo);
     }
     public boolean deleteNote(NoteVO vo){
-        return false;
+        return NoteDBHelper.getInstance().delete(vo);
     }
     public List<NoteVO> retreiveNotes(){
         return NoteDBHelper.getInstance().query();

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">QNote 岁月不回头</string>
+    <string name="app_name">QNote 签名便签</string>
     <string name="action_settings">自定义</string>
     <string name="signature">By QingYu</string>
 </resources>
